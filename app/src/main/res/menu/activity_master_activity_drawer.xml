@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_music_note_black_24dp"
+            android:title="Wszystkie" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_queue_music_black_24dp"
+            android:title="Moje Listy" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="Wyjście z aplikacji" />
+    </group>
+    <group android:checkableBehavior="single" android:id="@+id/USBgroup">
+        <item
+            android:id="@+id/nav_usb_audio"
+            android:icon="@drawable/ic_usb_black_24dp"
+            android:title="USB audio" />
+    </group>
+
+
+</menu>
