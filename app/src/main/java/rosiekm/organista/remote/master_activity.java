@@ -265,7 +265,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         BatteryStatus = findViewById(R.id.imageView_battery);
         timeText = this.findViewById(R.id.time_txt);
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        swipeRefreshLayout = findViewById(R.id.pullToRefresh);
+
         batteryManager = (BatteryManager) getApplication().getSystemService(Context.BATTERY_SERVICE);
 
 
@@ -450,7 +450,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                         for (String y : genres_list) {
                             ArrayList<AudioFileClass> tmp2 = new ArrayList<>();
                             for(AudioFileClass x: audioFileTmp) {
-                                if (x.getAlbum().contains(y)){
+                                if (x.getAlbum().equals(y)){
                                     tmp2.add(x);
                                 }
                             }
@@ -463,7 +463,12 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                         audioFilesMainListFragment.updateRooms(rooms);
 
                         audioFileClassArrayList.clear();
-                        audioFileClassArrayList.addAll((ArrayList<AudioFileClass>)msg.obj);
+                        try {
+                            audioFileClassArrayList.addAll((ArrayList<AudioFileClass>) msg.obj);
+                        }
+                        catch (Exception e){
+
+                        }
                         Log.d("AudioFiles", String.valueOf(audioFileClassArrayList.size()));
                     }
                     break;
@@ -473,6 +478,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     try {
                         for (AudioFileClass x : audioFileClassArrayList) {
                             if (x.getPath().contains((String) msg.obj)) {
+                                play.setVisibility(View.VISIBLE);
                                 currentLabel.setText(x.getTitle());
                                 currentMediaBar.setVisibility(View.VISIBLE);
                                 SetAudioBar();
@@ -498,6 +504,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
 
                 }
                 case PLAYING_VIDEO:{
+                    play.setVisibility(View.VISIBLE);
                     for (String x: ExternalDir){
                         ArrayList<File> files = (ArrayList<File>)usbDataCollection.get(x);
                         try {
@@ -537,6 +544,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
 
                 }
                 case IDLE:{
+                    play.setVisibility(View.GONE);
                     currentMediaBar.setVisibility(View.GONE);
                     clock.setVisibility(View.GONE);
                     stopTime = false;
