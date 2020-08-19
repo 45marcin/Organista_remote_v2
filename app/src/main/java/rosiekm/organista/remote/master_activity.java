@@ -1,5 +1,6 @@
 package rosiekm.organista.remote;
-
+//to set admin
+//adb shell dpm set-device-owner rosiekm.organista.remote/.AdminReceiver
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.admin.DevicePolicyManager;
@@ -56,6 +57,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -78,7 +80,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 
-public class master_activity extends AppCompatActivity  implements internalMessage{
+public class master_activity extends AppCompatActivity implements internalMessage {
 
     private static int volume = -1;
     private TextView batteryTxt;
@@ -144,7 +146,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
     RecyclerView mainlistView;
     RoomAdapter adapter;
 
-    ImageView usb, play, text, clock,image;
+    ImageView usb, play, text, clock, image;
 
     DBInterface dbInterface;
     ArrayList<AudioFileClass> audioFileClassArrayList;
@@ -168,7 +170,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         rooms = getRoomsData(audioFileClassArrayList);
 
         nowFile = 0;
-        btnTune =  findViewById(R.id.btn_tune);
+        btnTune = findViewById(R.id.btn_tune);
 
         usbDataCollection = new HashMap<>();
 
@@ -183,22 +185,18 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         mainActivity = this;
 
 
-
         audioFilesMyListFragment = new AudioFilesMainListFragment();
         audioFilesMyListFragment.setMaster(this);
         audioFilesMyListFragment.updateRooms(CustomRooms);
 
 
-
-
         audioFileClassArrayList = new ArrayList<>();
-
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.nav_home:
                         if (!audioFilesMainListFragment.isVisible()) {
                             getSupportFragmentManager().beginTransaction().replace(R.id.include, audioFilesMainListFragment, "HOME").addToBackStack("HOME").commit();
@@ -210,14 +208,18 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                             getSupportFragmentManager().beginTransaction().replace(R.id.include, audioFilesMyListFragment, "HOME").addToBackStack("HOME").commit();
                         }
                         break;
+                        /*
                     case R.id.nav_exit:
                         enableKioskMode(false);
                         finish();
                         break;
+                        */
                     case R.id.nav_usb_audio:
                         mainActivity.sendToMainActivity(SHOW_USB_LIST, null);
                         //mUiHandler.dispatchMessage(mUiHandler.obtainMessage(SHOW_USB_LIST));
                         break;
+
+
                 }
                 drawer.closeDrawer(Gravity.LEFT);
                 return false;
@@ -240,7 +242,6 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                 TimeStop();
             }
         });
-
 
 
         currentMediaBar = findViewById(R.id.current_media_bar);
@@ -282,9 +283,6 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         image.setVisibility(View.GONE);
 
 
-
-
-
         mBackgroundThread = new BackgroundThread();
         mBackgroundThread.start();
         mBackgroundThread2 = new BackgroundThread2();
@@ -314,12 +312,10 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         registerReceiver(myBroadastReceivers, mTime);
         timeText.setText(getCurrentTime());
 
-
-
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
-    public void showUsb(){
+    public void showUsb() {
         if (ExternalDir.size() > 0) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -336,10 +332,9 @@ public class master_activity extends AppCompatActivity  implements internalMessa
     }
 
 
-
     DevicePolicyManager mDpm;
 
-    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context ctxt, Intent intent) {
             int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
@@ -363,8 +358,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                 } else {
                     BatteryStatus.setImageDrawable(getDrawable(R.drawable.ic_battery_alert_black_24dp));
                 }
-            }
-            else{
+            } else {
                 if (level > 99) {
                     BatteryStatus.setImageDrawable(getDrawable(R.drawable.ic_battery_charging_full_black_24dp));
                 } else if (level > 90) {
@@ -389,13 +383,13 @@ public class master_activity extends AppCompatActivity  implements internalMessa
 
 
     @SuppressLint("HandlerLeak")
-    private  final Handler mUiHandler = new Handler(){
+    private final Handler mUiHandler = new Handler() {
         @RequiresApi(api = Build.VERSION_CODES.N)
-        public void handleMessage(Message msg){
-            switch ( msg.what){
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
                 case AVAILABLE: {
                     WifiState.setImageDrawable(getDrawable(R.drawable.ic_wifi_green));
-                    ip = (String)msg.obj;
+                    ip = (String) msg.obj;
                     break;
                 }
                 case NOT_AVAILABLE: {
@@ -403,15 +397,14 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     break;
                 }
 
-                case AUDIO_FILES:{
+                case AUDIO_FILES: {
                     //if (audioFileClassArrayList.size() != ((ArrayList<AudioFileClass>)msg.obj).size()){
-                        if (true){
+                    if (true) {
                         dbInterface.dropMainDB();
                         ArrayList<String> genres_list = new ArrayList<>();
-                        for (AudioFileClass x: (ArrayList<AudioFileClass>)msg.obj )
-                        {
+                        for (AudioFileClass x : (ArrayList<AudioFileClass>) msg.obj) {
                             dbInterface.insertDevice(x);
-                            if (!containString(genres_list, x.getAlbum())){
+                            if (!containString(genres_list, x.getAlbum())) {
                                 genres_list.add(x.getAlbum());
                             }
                         }
@@ -429,14 +422,13 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                             }
                         });
                         rooms.clear();
-                        ArrayList<AudioFileClass> audioFileTmp = (ArrayList<AudioFileClass>)msg.obj;
+                        ArrayList<AudioFileClass> audioFileTmp = (ArrayList<AudioFileClass>) msg.obj;
                         Collections.sort(audioFileTmp, new Comparator<AudioFileClass>() {
                             @Override
                             public int compare(AudioFileClass o1, AudioFileClass o2) {
-                                if (o1.getNumber().equals(o2.getNumber())){
+                                if (o1.getNumber().equals(o2.getNumber())) {
                                     return o1.getTitle().compareTo(o2.getTitle());
-                                }
-                                else{
+                                } else {
                                     return o1.getNumber().compareTo(o2.getNumber());
                                 }
                             }
@@ -449,12 +441,12 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                         // });
                         for (String y : genres_list) {
                             ArrayList<AudioFileClass> tmp2 = new ArrayList<>();
-                            for(AudioFileClass x: audioFileTmp) {
-                                if (x.getAlbum().equals(y)){
+                            for (AudioFileClass x : audioFileTmp) {
+                                if (x.getAlbum().equals(y)) {
                                     tmp2.add(x);
                                 }
                             }
-                            if (tmp2.size() >0){
+                            if (tmp2.size() > 0) {
                                 rooms.add(new Room(y, tmp2));
                             }
                         }
@@ -465,8 +457,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                         audioFileClassArrayList.clear();
                         try {
                             audioFileClassArrayList.addAll((ArrayList<AudioFileClass>) msg.obj);
-                        }
-                        catch (Exception e){
+                        } catch (Exception e) {
 
                         }
                         Log.d("AudioFiles", String.valueOf(audioFileClassArrayList.size()));
@@ -474,7 +465,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     break;
 
                 }
-                case PLAYING_AUDIO:{
+                case PLAYING_AUDIO: {
                     try {
                         for (AudioFileClass x : audioFileClassArrayList) {
                             if (x.getPath().contains((String) msg.obj)) {
@@ -496,17 +487,16 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                             }
 
                         }
-                    }
-                    catch (Exception e){
+                    } catch (Exception e) {
 
                     }
                     break;
 
                 }
-                case PLAYING_VIDEO:{
+                case PLAYING_VIDEO: {
                     play.setVisibility(View.VISIBLE);
-                    for (String x: ExternalDir){
-                        ArrayList<File> files = (ArrayList<File>)usbDataCollection.get(x);
+                    for (String x : ExternalDir) {
+                        ArrayList<File> files = (ArrayList<File>) usbDataCollection.get(x);
                         try {
                             for (File c : files) {
                                 if (c.getPath().contains((String) msg.obj)) {
@@ -515,8 +505,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                                     SetVideoBar();
                                 }
                             }
-                        }
-                        catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -524,7 +513,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     break;
 
                 }
-                case PLAYING_IMAGE:{
+                case PLAYING_IMAGE: {
                     try {
                         for (String x : ExternalDir) {
                             ArrayList<File> files = (ArrayList<File>) usbDataCollection.get(x);
@@ -536,51 +525,50 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                             }
 
                         }
-                    }
-                    catch (Exception e){
+                    } catch (Exception e) {
 
                     }
                     break;
 
                 }
-                case IDLE:{
+                case IDLE: {
                     play.setVisibility(View.GONE);
                     currentMediaBar.setVisibility(View.GONE);
                     clock.setVisibility(View.GONE);
                     stopTime = false;
                     break;
                 }
-                case TIME_STOP:{
+                case TIME_STOP: {
                     Toast.makeText(mainActivity, "ustawiono", Toast.LENGTH_SHORT).show();
                     clock.setVisibility(View.VISIBLE);
                     stopTime = true;
                     break;
                 }
-                case ENABLED_TIME_STOP:{
+                case ENABLED_TIME_STOP: {
                     clock.setVisibility(View.VISIBLE);
                     stopTime = true;
                     break;
                 }
-                case CANT_TIME_STOP:{
+                case CANT_TIME_STOP: {
                     Toast.makeText(mainActivity, "niemożliwe", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case TIME_STOP_CANCEL:{
+                case TIME_STOP_CANCEL: {
                     Toast.makeText(mainActivity, "odwołano", Toast.LENGTH_SHORT).show();
                     clock.setVisibility(View.GONE);
                     stopTime = false;
                     break;
                 }
-                case ALREADY_TIME_STOP_CANCEL:{
+                case ALREADY_TIME_STOP_CANCEL: {
                     clock.setVisibility(View.GONE);
                     stopTime = false;
                     break;
                 }
                 case GOT_BALANSE:
-                    balanse = (int)msg.obj;
+                    balanse = (int) msg.obj;
                     break;
                 case GOT_VOLUME:
-                    volume = (int)msg.obj;
+                    volume = (int) msg.obj;
                     break;
                 case MINUTE_CHANGED:
                     runOnUiThread(new Runnable() {
@@ -615,11 +603,10 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         }
     };
 
-    ArrayList<Room> getRoomsData(ArrayList<AudioFileClass> audioFiles){
+    ArrayList<Room> getRoomsData(ArrayList<AudioFileClass> audioFiles) {
         ArrayList<String> genres_list = new ArrayList<>();
-        for (AudioFileClass x: audioFiles)
-        {
-            if (!containString(genres_list, x.getAlbum())){
+        for (AudioFileClass x : audioFiles) {
+            if (!containString(genres_list, x.getAlbum())) {
                 genres_list.add(x.getAlbum());
             }
         }
@@ -652,12 +639,12 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         // });
         for (String y : genres_list) {
             ArrayList<AudioFileClass> tmp2 = new ArrayList<>();
-            for(AudioFileClass x: audioFileTmp) {
-                if (Arrays.equals(x.getAlbum().getBytes(), y.getBytes())){
+            for (AudioFileClass x : audioFileTmp) {
+                if (Arrays.equals(x.getAlbum().getBytes(), y.getBytes())) {
                     tmp2.add(x);
                 }
             }
-            if (tmp2.size() >0){
+            if (tmp2.size() > 0) {
                 out.add(new Room(y, tmp2));
             }
         }
@@ -665,11 +652,10 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         return out;
     }
 
-    ArrayList<String> getRoomsList(ArrayList<AudioFileClass> audioFiles){
+    ArrayList<String> getRoomsList(ArrayList<AudioFileClass> audioFiles) {
         ArrayList<String> genres_list = new ArrayList<>();
-        for (AudioFileClass x: audioFiles)
-        {
-            if (!containString(genres_list, x.getAlbum())){
+        for (AudioFileClass x : audioFiles) {
+            if (!containString(genres_list, x.getAlbum())) {
                 genres_list.add(x.getAlbum());
             }
         }
@@ -678,21 +664,23 @@ public class master_activity extends AppCompatActivity  implements internalMessa
     }
 
 
-    public static boolean containString(ArrayList<String> array, String item){
-        for(String x: array){
-            if (Arrays.equals(x.getBytes(), item.getBytes())){
+    public static boolean containString(ArrayList<String> array, String item) {
+        for (String x : array) {
+            if (Arrays.equals(x.getBytes(), item.getBytes())) {
                 return true;
             }
         }
         return false;
     }
+
     public static int balanse = 0;
     public static boolean stopTime = false;
+
     @Override
     public void sendToMainActivity(int what, Object obj) {
-        switch (what){
+        switch (what) {
             case PLAY_AUDIO:
-                Toast.makeText(this, (String)obj, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
                 new Thread(new Runnable() {
 
                     @Override
@@ -700,12 +688,11 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     public void run() {
                         //while (true) {
                         try {
-                            if (HttpRequests.PlayAudio(ip, (String)obj) == 200){
-                                try{
+                            if (HttpRequests.PlayAudio(ip, (String) obj) == 200) {
+                                try {
                                     mUiHandler.sendMessage(mUiHandler.obtainMessage(PLAYING_AUDIO, obj));
 
-                                }
-                                catch (Exception e){
+                                } catch (Exception e) {
 
                                 }
                                 //break;
@@ -732,9 +719,8 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                         try {
 
                             HttpRequests.SetBalanse(ip, (int) obj);
-                            balanse = (int)obj;
-                        }
-                        catch (Exception e){
+                            balanse = (int) obj;
+                        } catch (Exception e) {
 
                         }
                     }
@@ -749,9 +735,8 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                         try {
 
                             HttpRequests.SetVolume(ip, (int) obj);
-                            volume = (int)obj;
-                        }
-                        catch (Exception e){
+                            volume = (int) obj;
+                        } catch (Exception e) {
 
                         }
                     }
@@ -762,7 +747,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                 PopupChoseList editNameDialogFragment = PopupChoseList.newInstance("Some Title");
                 editNameDialogFragment.setMaster(this);
                 editNameDialogFragment.setMyLists(myList);
-                editNameDialogFragment.setAudioFileClass((AudioFileClass)obj);
+                editNameDialogFragment.setAudioFileClass((AudioFileClass) obj);
                 editNameDialogFragment.show(mainActivity.getSupportFragmentManager(), "fragment_edit_name");
                 break;
             case SHOW_USB_LIST:
@@ -775,7 +760,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
 
             case ADD_TO_MY_LIST_FINAL:
                 try {
-                    AudioFileClass tmp = (AudioFileClass)((AudioFileClass) obj).clone();
+                    AudioFileClass tmp = (AudioFileClass) ((AudioFileClass) obj).clone();
 
                     tmp.setType((byte) 0x1);
                     MyAudioFileClassArrayList.add(tmp);
@@ -783,37 +768,34 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     myList = getRoomsList(MyAudioFileClassArrayList);
                     dbInterface.insertDeviceMyList(tmp);
                     Notify("Dodano: " + tmp.getTitle() + "\ndo listy " + tmp.getAlbum());
-                }
-                catch (Exception e){
+                } catch (Exception e) {
 
                 }
                 break;
 
 
             case REMOVE_FROM_MY_LIST:
-                AudioFileClass tmp2 = (AudioFileClass)obj;
-                MyAudioFileClassArrayList.remove((AudioFileClass)obj);
+                AudioFileClass tmp2 = (AudioFileClass) obj;
+                MyAudioFileClassArrayList.remove((AudioFileClass) obj);
                 CustomRooms = getRoomsData(MyAudioFileClassArrayList);
                 myList = getRoomsList(MyAudioFileClassArrayList);
                 audioFilesMyListFragment.updateRooms(CustomRooms);
-                dbInterface.removeFromMyAudio((AudioFileClass)obj);
-                Notify("Usunięto: " + tmp2.getTitle() +  "\nz listy " + tmp2.getAlbum());
+                dbInterface.removeFromMyAudio((AudioFileClass) obj);
+                Notify("Usunięto: " + tmp2.getTitle() + "\nz listy " + tmp2.getAlbum());
                 break;
 
             case SHOW_INFO:
                 try {
                     AudioFileClass tmp3 = (AudioFileClass) obj;
                     Notify(tmp3.getTitle());
-                }
-                catch ( Exception e){
+                } catch (Exception e) {
 
                 }
 
                 try {
                     MyAudioFile tmp3 = (MyAudioFile) obj;
                     Notify(tmp3.getTitle());
-                }
-                catch ( Exception e){
+                } catch (Exception e) {
 
                 }
                 break;
@@ -822,15 +804,14 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                 try {
                     ExpandableListFragmentUSB USBDeviceFragment = new ExpandableListFragmentUSB();
                     USBDeviceFragment.setMaster(mainActivity);
-                    USBDeviceFragment.updateRooms(usbDataCollection.get((String)obj));
+                    USBDeviceFragment.updateRooms(usbDataCollection.get((String) obj));
                     getSupportFragmentManager().beginTransaction().replace(R.id.include, USBDeviceFragment, "HOME").addToBackStack("HOME").commit();
-                }
-                catch ( Exception e){
+                } catch (Exception e) {
 
                 }
                 break;
             case PLAY_VIDEO:
-                Toast.makeText(this, (String)obj, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
                 new Thread(new Runnable() {
 
                     @Override
@@ -838,12 +819,11 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     public void run() {
                         //while (true) {
                         try {
-                            if (HttpRequests.PlayVideo(ip, (String)obj) == 200){
-                                try{
+                            if (HttpRequests.PlayVideo(ip, (String) obj) == 200) {
+                                try {
                                     mUiHandler.sendMessage(mUiHandler.obtainMessage(PLAYING_AUDIO, obj));
 
-                                }
-                                catch (Exception e){
+                                } catch (Exception e) {
 
                                 }
                                 //break;
@@ -862,7 +842,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                 }).start();
                 break;
             case SHOW_IMAGE:
-                Toast.makeText(this, (String)obj, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
                 new Thread(new Runnable() {
 
                     @Override
@@ -870,12 +850,11 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     public void run() {
                         //while (true) {
                         try {
-                            if (HttpRequests.ShowImage(ip, (String)obj) == 200){
-                                try{
-                                   mUiHandler.sendMessage(mUiHandler.obtainMessage(PLAYING_IMAGE, obj));
+                            if (HttpRequests.ShowImage(ip, (String) obj) == 200) {
+                                try {
+                                    mUiHandler.sendMessage(mUiHandler.obtainMessage(PLAYING_IMAGE, obj));
 
-                                }
-                                catch (Exception e){
+                                } catch (Exception e) {
 
                                 }
                                 //break;
@@ -898,20 +877,18 @@ public class master_activity extends AppCompatActivity  implements internalMessa
         }
     }
 
-    public class BackgroundThread extends Thread{
+    public class BackgroundThread extends Thread {
         private Handler mBackgroundHandler;
 
 
-
-        public void run(){
+        public void run() {
             Looper.prepare();
-            while (true){
-                try{
+            while (true) {
+                try {
                     mBackgroundHandler = new Handler();
                     Log.d("run_working", "loop");
                     break;
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Log.d(this.toString(), e.toString());
                 }
             }
@@ -921,9 +898,8 @@ public class master_activity extends AppCompatActivity  implements internalMessa
 
         }
 
-        public void doWork(){
-            mBackgroundHandler.post(new Runnable(){
-
+        public void doWork() {
+            mBackgroundHandler.post(new Runnable() {
 
 
                 @Override
@@ -931,14 +907,12 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                     mBackgroundHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            while (true){
+                            while (true) {
                                 try {
                                     mUiHandler.sendMessage(mUiHandler.obtainMessage(0));
-                                }
-                                catch (Exception e){
+                                } catch (Exception e) {
 
-                                }
-                                finally {
+                                } finally {
                                     SystemClock.sleep(5000);
                                 }
 
@@ -958,11 +932,11 @@ public class master_activity extends AppCompatActivity  implements internalMessa
 
     }
 
-    public void Notify(String msg){
-        Snackbar.make(findViewById(R.id.drawer_layout),msg,Snackbar.LENGTH_LONG).show();
+    public void Notify(String msg) {
+        Snackbar.make(findViewById(R.id.drawer_layout), msg, Snackbar.LENGTH_LONG).show();
     }
 
-    public class BackgroundThread2 extends Thread{
+    public class BackgroundThread2 extends Thread {
         private Handler mBackgroundHandler;
         WifiManager wifiManager;
         String networkSSID = "OrganistaAP";
@@ -976,13 +950,13 @@ public class master_activity extends AppCompatActivity  implements internalMessa
                 wifiManager.setWifiEnabled(true);
             }
             Log.d("wifi", wifiManager.getConnectionInfo().toString());
-            if (wifiManager.getConnectionInfo().getSSID().contains(networkSSID) & wifiManager.getConnectionInfo().getSupplicantState() == SupplicantState.COMPLETED){
+            if (wifiManager.getConnectionInfo().getSSID().contains(networkSSID) & wifiManager.getConnectionInfo().getSupplicantState() == SupplicantState.COMPLETED) {
                 mUiHandler.sendMessage(mUiHandler.obtainMessage(WIFI_CONNECTED));
                 return;
-            }
-            else{
+            } else {
                 mUiHandler.sendMessage(mUiHandler.obtainMessage(WIFI_DISCONNECTED));
             }
+
 
             List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
             for (WifiConfiguration i : list) {
@@ -996,6 +970,7 @@ public class master_activity extends AppCompatActivity  implements internalMessa
             }
 
             wifiManager.addNetwork(conf);
+
 
             list = wifiManager.getConfiguredNetworks();
             for (WifiConfiguration i : list) {

@@ -12,10 +12,10 @@
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_queue_music_black_24dp"
             android:title="Moje Listy" />
-        <item
+        <!--<item
             android:id="@+id/nav_exit"
             android:icon="@drawable/ic_exit_to_app_black_24dp"
-            android:title="Wyjście z aplikacji" />
+            android:title="Wyjście z aplikacji" />-->
     </group>
     <group android:checkableBehavior="single" android:id="@+id/USBgroup">
         <item
