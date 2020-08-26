@@ -71,9 +71,10 @@ public class USBDeviceAdapter extends ExpandableRecyclerViewAdapter<GroupViewHol
             holder.length.setVisibility(View.GONE);
         }
         //holder.length.setText(StringUtils.getTimeInString(((Room) group).getItems().get(childIndex).getLength()));
-        holder.playBtn.setOnClickListener(new View.OnClickListener() {
+        holder.playBtn.setOnLongClickListener(new View.OnLongClickListener() {
+
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 if (tmp.getClass() == MyAudioFile.class) {
                     main.sendToMainActivity(PLAY_AUDIO, tmp.getPath());
                 }
@@ -83,6 +84,7 @@ public class USBDeviceAdapter extends ExpandableRecyclerViewAdapter<GroupViewHol
                 else if (tmp.getClass() == ImageFile.class) {
                     main.sendToMainActivity(SHOW_IMAGE, tmp.getPath());
                 }
+                return false;
             }
         });
         holder.infoBtn.setOnClickListener(new View.OnClickListener() {

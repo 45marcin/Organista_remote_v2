@@ -1,6 +1,10 @@
 package rosiekm.organista.remote.ExpandableListDevices;
 
 
+import android.content.Context;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,10 +52,11 @@ public class RoomAdapter extends ExpandableRecyclerViewAdapter<BtGroupViewHolder
         final AudioFileClass artist = ((Room) group).getItems().get(childIndex);
         holder.setName(artist.getTitle());
         holder.length.setText(StringUtils.getTimeInString(((Room) group).getItems().get(childIndex).getLength()));
-        holder.playBtn.setOnClickListener(new View.OnClickListener() {
+        holder.playBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 main.sendToMainActivity(PLAY_AUDIO,((Room) group).getItems().get(childIndex).getPath());
+                return false;
             }
         });
         holder.infoBtn.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +79,7 @@ public class RoomAdapter extends ExpandableRecyclerViewAdapter<BtGroupViewHolder
                 holder.fncBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         main.sendToMainActivity(REMOVE_FROM_MY_LIST,((Room) group).getItems().get(childIndex));
                     }
                 });

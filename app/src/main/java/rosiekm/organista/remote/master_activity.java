@@ -25,6 +25,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
@@ -157,18 +159,25 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
     master_activity mainActivity;
     HashMap<String, ArrayList<File>> usbDataCollection;
-
+    Vibrator vibe;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         setContentView(R.layout.activity_master_activity);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         myBroadastReceivers = new MyBroadastReceivers();
         dbInterface = new DBInterface(this);
         audioFileClassArrayList = dbInterface.getAllAudioFiles();
-        rooms = getRoomsData(audioFileClassArrayList);
+        try {
+            rooms = getRoomsData(audioFileClassArrayList);
+        }
+        catch (Exception e){
 
+        }
         nowFile = 0;
         btnTune = findViewById(R.id.btn_tune);
 
@@ -229,17 +238,21 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
         currentLabel = findViewById(R.id.label_current_media);
         stopBtn = findViewById(R.id.btn_stop);
-        stopBtn.setOnClickListener(new View.OnClickListener() {
+        stopBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                vibrate();
                 Stop();
+                return false;
             }
         });
         stopTimeBtn = findViewById(R.id.btn_stop_when_you_can);
-        stopTimeBtn.setOnClickListener(new View.OnClickListener() {
+        stopTimeBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                vibrate();
                 TimeStop();
+                return false;
             }
         });
 
@@ -680,7 +693,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
     public void sendToMainActivity(int what, Object obj) {
         switch (what) {
             case PLAY_AUDIO:
-                Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
                 new Thread(new Runnable() {
 
                     @Override
@@ -689,6 +702,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
                         //while (true) {
                         try {
                             if (HttpRequests.PlayAudio(ip, (String) obj) == 200) {
+                                vibrate();
                                 try {
                                     mUiHandler.sendMessage(mUiHandler.obtainMessage(PLAYING_AUDIO, obj));
 
@@ -718,6 +732,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
                     public void run() {
                         try {
 
+                            vibrate();
                             HttpRequests.SetBalanse(ip, (int) obj);
                             balanse = (int) obj;
                         } catch (Exception e) {
@@ -734,6 +749,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
                     public void run() {
                         try {
 
+                            vibrate();
                             HttpRequests.SetVolume(ip, (int) obj);
                             volume = (int) obj;
                         } catch (Exception e) {
@@ -759,6 +775,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
 
             case ADD_TO_MY_LIST_FINAL:
+                vibrate();
                 try {
                     AudioFileClass tmp = (AudioFileClass) ((AudioFileClass) obj).clone();
 
@@ -775,6 +792,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
 
             case REMOVE_FROM_MY_LIST:
+                vibrate();
                 AudioFileClass tmp2 = (AudioFileClass) obj;
                 MyAudioFileClassArrayList.remove((AudioFileClass) obj);
                 CustomRooms = getRoomsData(MyAudioFileClassArrayList);
@@ -811,7 +829,8 @@ public class master_activity extends AppCompatActivity implements internalMessag
                 }
                 break;
             case PLAY_VIDEO:
-                Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
+                vibrate();
+                //Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
                 new Thread(new Runnable() {
 
                     @Override
@@ -842,7 +861,8 @@ public class master_activity extends AppCompatActivity implements internalMessag
                 }).start();
                 break;
             case SHOW_IMAGE:
-                Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
+                vibrate();
+                //Toast.makeText(this, (String) obj, Toast.LENGTH_LONG).show();
                 new Thread(new Runnable() {
 
                     @Override
@@ -1272,6 +1292,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
             public void run() {
                 try  {
                     if (HttpRequests.StopAudio(ip) == 200) {
+                        vibrate();
                         mUiHandler.sendMessage(mUiHandler.obtainMessage(IDLE));
                     }
                 } catch (Exception e) {
@@ -1291,6 +1312,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
             public void run() {
                 try  {
                     if (HttpRequests.StopVideo(ip) == 200) {
+                        vibrate();
                         mUiHandler.sendMessage(mUiHandler.obtainMessage(IDLE));
                     }
                 } catch (Exception e) {
@@ -1329,6 +1351,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
                 public void run() {
                     try {
                         if (HttpRequests.StopTimeAudio(ip) == 200) {
+                            vibrate();
                             mUiHandler.sendMessage(mUiHandler.obtainMessage(TIME_STOP));
                         }
                         else{
@@ -1349,6 +1372,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
                 public void run() {
                     try {
                         if (HttpRequests.StopTimeAudioCancel(ip) == 200) {
+                            vibrate();
                             mUiHandler.sendMessage(mUiHandler.obtainMessage(TIME_STOP_CANCEL));
                         }
                     } catch (Exception e) {
@@ -1365,6 +1389,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (volume != -1) {
+            vibrate();
             if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
                 //showMessage("volume down");
                 volume = volume -1;
@@ -1389,6 +1414,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
             }
             else if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)) {
                 //showMessage("volume up");
+                vibrate();
 
                 volume = volume +1;
                 if (volume > 100){
@@ -1525,20 +1551,35 @@ public class master_activity extends AppCompatActivity implements internalMessag
         return genres_list;
     }
     ImageButton btnTune;
-
+    void vibrate(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibe.vibrate(VibrationEffect.createOneShot(180, VibrationEffect.EFFECT_DOUBLE_CLICK));
+        } else {
+            //deprecated in API 26
+            vibe.vibrate(180);
+        }
+    }
     void SetAudioBar(){
-        stopBtn.setOnClickListener(new View.OnClickListener() {
+        stopBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                vibrate();
                 Stop();
+                return true;
             }
+
         });
-        stopTimeBtn.setOnClickListener(new View.OnClickListener() {
+
+        stopTimeBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                vibrate();
                 TimeStop();
+                return true;
             }
+
         });
+
         stopBtn.setImageResource(R.drawable.ic_stop_black);
         stopTimeBtn.setImageResource(R.drawable.ic_timer_blac);
         stopBtn.setVisibility(View.VISIBLE);
@@ -1548,18 +1589,26 @@ public class master_activity extends AppCompatActivity implements internalMessag
     }
 
     void SetVideoBar(){
-        stopBtn.setOnClickListener(new View.OnClickListener() {
+        stopBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                vibrate();
                 StopVideo();
+                return true;
             }
+
         });
-        stopTimeBtn.setOnClickListener(new View.OnClickListener() {
+
+        stopTimeBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                vibrate();
                 PauseResumeVideo();
+                return true;
             }
+
         });
+
         stopBtn.setImageResource(R.drawable.ic_stop_black);
         stopTimeBtn.setImageResource(R.drawable.ic_skip_next_black_24dp);
         btnTune.setVisibility(View.VISIBLE);
@@ -1570,11 +1619,14 @@ public class master_activity extends AppCompatActivity implements internalMessag
     void SetImageBar(){
         stopBtn.setVisibility(View.VISIBLE);
         stopTimeBtn.setVisibility(View.GONE);
-        stopBtn.setOnClickListener(new View.OnClickListener() {
+        stopBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                vibrate();
                 hideImage();
+                return true;
             }
+
         });
         btnTune.setVisibility(View.GONE);
         stopBtn.setImageResource(R.drawable.ic_remove_from_queue_black_24dp);

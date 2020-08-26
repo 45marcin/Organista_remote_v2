@@ -60,42 +60,43 @@ public class AudioFilesMainListFragment extends Fragment implements  internalMes
     ArrayList<Integer> expanded;
 
     public  void updateRooms(ArrayList<Room> rooms){
-        if (adapter != null) {
-            expanded = new ArrayList<Integer>();
-            for (int x = 0; x < rooms.size(); x++) {
-                try {
-                    if (adapter.isGroupExpanded(x)) {
-                        expanded.add(x);
+        try {
+            if (adapter != null) {
+                expanded = new ArrayList<Integer>();
+                for (int x = 0; x < rooms.size(); x++) {
+                    try {
+                        if (adapter.isGroupExpanded(x)) {
+                            expanded.add(x);
+                        }
+                    } catch (Exception e) {
+
                     }
                 }
-                catch (Exception e){
+            }
+            if (mainlistView != null) {
+                mainlistView.setAdapter(adapter);
+            }
+            if (this.rooms == null) {
+                this.rooms = new ArrayList<>();
+            } else {
+                this.rooms.clear();
+            }
+            this.rooms.addAll(rooms);
+            adapter = new RoomAdapter(this.rooms, this);
+            if (expanded != null) {
+                for (Integer x : expanded) {
+                    try {
+                        adapter.toggleGroup(x);
+                    } catch (Exception e) {
 
+                    }
                 }
             }
-        }
-        if (mainlistView != null) {
-            mainlistView.setAdapter(adapter);
-        }
-        if (this.rooms == null){
-            this.rooms = new ArrayList<>();
-        }
-        else{
-            this.rooms.clear();
-        }
-        this.rooms.addAll(rooms);
-        adapter = new RoomAdapter(this.rooms,this);
-        if (expanded != null) {
-            for (Integer x : expanded) {
-                try {
-                    adapter.toggleGroup(x);
-                }
-                catch (Exception e){
 
-                }
-            }
         }
+        catch (Exception e){
 
-
+        }
     }
 
     @Override
