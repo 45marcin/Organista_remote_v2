@@ -959,10 +959,10 @@ public class master_activity extends AppCompatActivity implements internalMessag
     public class BackgroundThread2 extends Thread {
         private Handler mBackgroundHandler;
         WifiManager wifiManager;
-        String networkSSID = "OrganistaAP";
-        String networkPass = "Organista123";
-        //String networkSSID = "WiFi";
-        //String networkPass = "netiAasmax";
+        //String networkSSID = "OrganistaAP";
+        //String networkPass = "Organista123";
+        String networkSSID = "WiFi";
+        String networkPass = "netiAasmax";
         WifiConfiguration conf;
 
         public void ConnectNetwork() {

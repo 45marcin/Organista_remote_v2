@@ -29,7 +29,7 @@ public class HttpRequests {
     public static HashMap<String, Object> GetStatus(String url) throws IOException {
         HashMap<String, Object> HashResponse = new HashMap<>();
         try {
-            String urll = "http:/"+  url + ":9000/getStatus";
+            String urll = "http:/"+  url + ":9000/start?device=status";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
@@ -83,7 +83,7 @@ public class HttpRequests {
     public static HashMap<String, Object> GetAudioFiles(String url) throws IOException {
         HashMap<String, Object> HashResponse = new HashMap<>();
         try {
-            String urll = "http:/"+  url + ":9000/getAudioFiles";
+            String urll = "http:/"+  url + ":9000/start?audio=get_files";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
@@ -94,22 +94,23 @@ public class HttpRequests {
             String audioFilesInJson =  new String(response.body().bytes(), StandardCharsets.UTF_8);
             Log.d("audiofiles", audioFilesInJson);
 
-            JSONObject jsonObject = new JSONObject(audioFilesInJson);
-            if (jsonObject.getBoolean("data")){
-                ArrayList<AudioFileClass> audioFiles = new ArrayList<>();
-                JSONArray array = jsonObject.getJSONArray("files");
+            JSONArray array = new JSONArray(audioFilesInJson);
 
-                for (int x = 0; x < array.length(); x++){
-                    JSONObject file = array.getJSONObject(x);
-                    audioFiles.add(new AudioFileClassBuilder()
-                            .setTitle(file.getString("title"))
-                            .setAlbum(file.getString("album"))
-                            .setLength(file.getInt("length"))
-                            .setPath(file.getString("path"))
-                            .setNumber(file.getInt("number"))
-                            .createAudioFileClass());
-                }
+            ArrayList<AudioFileClass> audioFiles = new ArrayList<>();
 
+            for (int x = 0; x < array.length(); x++){
+                JSONObject file = array.getJSONObject(x);
+                audioFiles.add(new AudioFileClassBuilder()
+                        .setTitle(file.getString("title"))
+                        .setAlbum(file.getString("album"))
+                        .setLength(60)
+                        //.setLength(file.getInt("length"))
+                        .setPath(file.getString("path"))
+                        .setNumber(file.getInt("number"))
+                        .createAudioFileClass());
+            }
+
+            if (!audioFiles.isEmpty()) {
                 HashResponse.put("audioFiles", audioFiles);
             }
             else{
@@ -209,7 +210,7 @@ public class HttpRequests {
 
     public static int PlayAudio(String url, String path) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/playAudio";
+            String urll = "http:/"+  url + ":9000/start?audio=play&file="+path;
             Log.d("url", urll);
             Log.d("path", path);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
@@ -333,7 +334,7 @@ public class HttpRequests {
 
     public static int StopAudio(String url) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/stopAudio";
+            String urll = "http:/"+  url + ":9000/start?audio=stop";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
             JSONObject object = new JSONObject();
@@ -342,6 +343,7 @@ public class HttpRequests {
                     .url(urll)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("cache-control", "no-cache")
+                    .post(body)
                     .build();
             Response response = client.newCall(request).execute();
             Log.d("response status", response.body().string());
@@ -356,7 +358,7 @@ public class HttpRequests {
 
     public static int StopTimeAudio(String url) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/stopTimeAudio";
+            String urll = "http:/"+  url + ":9000/start?audio=stop_time";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
             JSONObject object = new JSONObject();
@@ -365,6 +367,7 @@ public class HttpRequests {
                     .url(urll)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("cache-control", "no-cache")
+                    .post(body)
                     .build();
             Response response = client.newCall(request).execute();
             Log.d("response status", response.body().string());
@@ -379,7 +382,7 @@ public class HttpRequests {
 
     public static int StopTimeAudioCancel(String url) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/stopTimeAudioCancel";
+            String urll = "http:/"+  url + ":9000/start?audio=stop_time_cancek";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
             JSONObject object = new JSONObject();
@@ -402,7 +405,7 @@ public class HttpRequests {
 
     public static int StopVideo(String url) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/stopVideo";
+            String urll = "http:/"+  url + ":9000/start?audio=stop";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
             JSONObject object = new JSONObject();
