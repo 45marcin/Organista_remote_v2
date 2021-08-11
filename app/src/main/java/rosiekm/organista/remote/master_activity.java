@@ -1009,6 +1009,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
             }
         }
 
+
         public void init(){
 
             wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
