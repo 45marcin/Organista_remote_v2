@@ -88,7 +88,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
     private TextView batteryTxt;
     private TextView timeText;
     BackgroundThread mBackgroundThread;
-    BackgroundThread2 mBackgroundThread2;
+    //BackgroundThread2 mBackgroundThread2;
     BackgroundThread3 mBackgroundThread3;
     BatteryManager batteryManager;
     ImageView WifiState;
@@ -298,8 +298,8 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
         mBackgroundThread = new BackgroundThread();
         mBackgroundThread.start();
-        mBackgroundThread2 = new BackgroundThread2();
-        mBackgroundThread2.start();
+        //mBackgroundThread2 = new BackgroundThread2();
+        //mBackgroundThread2.start();
         mBackgroundThread3 = new BackgroundThread3();
         mBackgroundThread3.start();
 
@@ -956,6 +956,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
         Snackbar.make(findViewById(R.id.drawer_layout), msg, Snackbar.LENGTH_LONG).show();
     }
 
+    /*
     public class BackgroundThread2 extends Thread {
         private Handler mBackgroundHandler;
         WifiManager wifiManager;
@@ -1002,6 +1003,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
                 }
             }
         }
+
 
         public void init(){
 
@@ -1069,6 +1071,8 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
 
     }
+
+     */
 
     private  boolean checkAndRequestPermissions() {
         int locationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
