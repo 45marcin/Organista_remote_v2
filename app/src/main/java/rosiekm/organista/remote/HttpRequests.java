@@ -103,10 +103,10 @@ public class HttpRequests {
                 audioFiles.add(new AudioFileClassBuilder()
                         .setTitle(file.getString("title"))
                         .setAlbum(file.getString("album"))
-                        .setLength(60)
+                        .setLength(file.getInt("length"))
                         //.setLength(file.getInt("length"))
                         .setPath(file.getString("path"))
-                        .setNumber(file.getInt("number"))
+                        //.setNumber(file.getInt("number"))
                         .createAudioFileClass());
             }
 
@@ -130,75 +130,65 @@ public class HttpRequests {
         HashMap<String, Object> HashResponse = new HashMap<>();
         ArrayList<File> data2 = new ArrayList<>();
         try {
-            String urll = "http:/"+  url + ":9000/getUSBFiles";
+            String urll = "http:/"+  url + ":9000/getUSBFiles?usb=get_files&path=" + dir;
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient();
-            RequestBody body = RequestBody.create(MediaType.parse("application/json"), dir);
             Request request = new Request.Builder()
                     .url(urll)
                     .get()
-                    .post(body)
                     .build();
             Response response = client.newCall(request).execute();
             String data =  new String(response.body().bytes(), StandardCharsets.UTF_8);
             Log.d("audiofiles", data);
 
             JSONObject jsonObject = new JSONObject(data);
-            if (jsonObject.getBoolean("data")){
-                if(jsonObject.getBoolean("AudioData")){
-                    Log.d("AudioData", "True");
-                    ArrayList<MyAudioFile> audioFileArrayList = new ArrayList<>();
-                    JSONArray audiotmp = jsonObject.getJSONArray("AudioFiles");
-                    for (int x =0 ; x < audiotmp.length(); x++) {
-                        JSONObject tmp = audiotmp.getJSONObject(x);
-                        //audioFileArrayList.add(new MyAudioFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album"),tmp.getInt("length")));
-                        data2.add(new MyAudioFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album"),tmp.getInt("length")));
-                    }
-                    HashResponse.put("audioData", true);
-                    //HashResponse.put("audioUSB", audioFileArrayList);
+
+
+
+            JSONArray audiotmp = jsonObject.getJSONArray("audioFiles");
+            if (audiotmp.length() > 0) {
+                for (int x = 0; x < audiotmp.length(); x++) {
+                    JSONObject tmp = audiotmp.getJSONObject(x);
+                    //audioFileArrayList.add(new MyAudioFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album"),tmp.getInt("length")));
+                    data2.add(new MyAudioFile(tmp.getString("title"), tmp.getString("path"), tmp.getString("album"), tmp.getInt("length")));
                 }
-                else {
-                    Log.d("AudioData", "False");
-                    HashResponse.put("audioData", false);
-                }
-                if(jsonObject.getBoolean("VideoData")){
-                    Log.d("VideoData", "True");
-                    ArrayList<VideoFile> audioFileArrayList = new ArrayList<>();
-                    JSONArray audiotmp = jsonObject.getJSONArray("VideoFiles");
-                    for (int x =0 ; x < audiotmp.length(); x++) {
-                        JSONObject tmp = audiotmp.getJSONObject(x);
-                        //audioFileArrayList.add(new VideoFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album"),tmp.getInt("length")));
-                        data2.add(new VideoFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album"),tmp.getInt("length")));
-                    }
-                    HashResponse.put("videoData", true);
-                    //HashResponse.put("videoUSB", audioFileArrayList);
-                }
-                else {
-                    Log.d("VideoData", "False");
-                    HashResponse.put("videoData", false);
-                }
-                if(jsonObject.getBoolean("ImageData")){
-                    Log.d("ImageData", "True");
-                    ArrayList<ImageFile> audioFileArrayList = new ArrayList<>();
-                    JSONArray audiotmp = jsonObject.getJSONArray("ImageFiles");
-                    for (int x =0 ; x < audiotmp.length(); x++) {
-                        JSONObject tmp = audiotmp.getJSONObject(x);
-                        //audioFileArrayList.add(new ImageFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album")));
-                        data2.add(new ImageFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album")));
-                    }
-                    HashResponse.put("imageData", true);
-                    //HashResponse.put("imageUSB", audioFileArrayList);
-                }
-                else {
-                    Log.d("ImageData", "False");
-                    HashResponse.put("imageData", false);
-                }
-                HashResponse.put("data", true);
-                HashResponse.put("USBFiles", data2);
+
+                HashResponse.put("audioData", true);
             }
             else{
-                HashResponse.put("data", false);
+                HashResponse.put("audioData", false);
             }
+
+            JSONArray videotmp = jsonObject.getJSONArray("videoFiles");
+            if (videotmp.length() > 0){
+                for (int x =0 ; x < videotmp.length(); x++) {
+                    JSONObject tmp = videotmp.getJSONObject(x);
+                    //audioFileArrayList.add(new VideoFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album"),tmp.getInt("length")));
+                    data2.add(new VideoFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("title"),tmp.getInt("length")));
+                }
+                HashResponse.put("videoData", true);
+            }
+            else{
+                HashResponse.put("videoData", false);
+            }
+
+            JSONArray imagetmp = jsonObject.getJSONArray("imageFiles");
+            if (imagetmp.length() > 0) {
+                for (int x = 0; x < imagetmp.length(); x++) {
+                    JSONObject tmp = imagetmp.getJSONObject(x);
+                    //audioFileArrayList.add(new ImageFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album")));
+                    data2.add(new ImageFile(tmp.getString("title"), tmp.getString("path"), tmp.getString("album")));
+                }
+                HashResponse.put("imageData", true);
+            }
+            else{
+                HashResponse.put("imageData", false);
+            }
+
+
+            HashResponse.put("data", true);
+            HashResponse.put("USBFiles", data2);
+
             return HashResponse;
         }
         catch (Exception e){
@@ -236,7 +226,7 @@ public class HttpRequests {
 
     public static int PlayVideo(String url, String path) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/playThisVideo";
+            String urll = "http:/"+  url + ":9000/start?video=play&file="+path;
             Log.d("url", urll);
             Log.d("path", path);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
@@ -288,7 +278,7 @@ public class HttpRequests {
 
     public static int SetBalanse(String url, int balanse) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/setBalanse";
+            String urll = "http:/"+  url + ":9000/organista?audio=balance&value=" + balanse;
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
 
             RequestBody body = RequestBody.create(MediaType.parse("application/json"), String.valueOf(balanse));
@@ -310,10 +300,10 @@ public class HttpRequests {
     }
     public static int SetVolume(String url, int volume) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/setVolume";
+            String urll = "http:/"+  url + ":9000/organista?audio=set_volume&value=" + volume;
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
 
-            RequestBody body = RequestBody.create(MediaType.parse("application/json"), String.valueOf(volume));
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), "");
             Request request = new Request.Builder()
                     .url(urll)
                     .post(body)
@@ -344,6 +334,7 @@ public class HttpRequests {
                     .addHeader("Content-Type", "application/json")
                     .addHeader("cache-control", "no-cache")
                     .post(body)
+
                     .build();
             Response response = client.newCall(request).execute();
             Log.d("response status", response.body().string());
@@ -405,7 +396,7 @@ public class HttpRequests {
 
     public static int StopVideo(String url) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/start?audio=stop";
+            String urll = "http:/"+  url + ":9000/start?video=stop";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
             JSONObject object = new JSONObject();
@@ -414,6 +405,7 @@ public class HttpRequests {
                     .url(urll)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("cache-control", "no-cache")
+                    .post(body)
                     .build();
             Response response = client.newCall(request).execute();
             Log.d("response status", response.body().string());

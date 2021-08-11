@@ -59,6 +59,7 @@
         android:layout_marginBottom="8dp"
         android:text="TextView"
         android:textSize="16dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/song_play"
         app:layout_constraintTop_toTopOf="parent" />

@@ -88,7 +88,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
     private TextView batteryTxt;
     private TextView timeText;
     BackgroundThread mBackgroundThread;
-    BackgroundThread2 mBackgroundThread2;
+    //BackgroundThread2 mBackgroundThread2;
     BackgroundThread3 mBackgroundThread3;
     BatteryManager batteryManager;
     ImageView WifiState;
@@ -298,8 +298,8 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
         mBackgroundThread = new BackgroundThread();
         mBackgroundThread.start();
-        mBackgroundThread2 = new BackgroundThread2();
-        mBackgroundThread2.start();
+        //mBackgroundThread2 = new BackgroundThread2();
+        //mBackgroundThread2.start();
         mBackgroundThread3 = new BackgroundThread3();
         mBackgroundThread3.start();
 
@@ -413,67 +413,73 @@ public class master_activity extends AppCompatActivity implements internalMessag
                 case AUDIO_FILES: {
                     //if (audioFileClassArrayList.size() != ((ArrayList<AudioFileClass>)msg.obj).size()){
                     if (true) {
-                        dbInterface.dropMainDB();
-                        ArrayList<String> genres_list = new ArrayList<>();
-                        for (AudioFileClass x : (ArrayList<AudioFileClass>) msg.obj) {
-                            dbInterface.insertDevice(x);
-                            if (!containString(genres_list, x.getAlbum())) {
-                                genres_list.add(x.getAlbum());
-                            }
-                        }
-
-                        //genres_list.sort(new Comparator<String>() {
-                        //    @Override
-                        //    public int compare(String o1, String o2) {
-                        //        return o1.compareTo(o2);
-                        //     }
-                        /// });
-                        Collections.sort(genres_list, new Comparator<String>() {
-                            @Override
-                            public int compare(String o1, String o2) {
-                                return o1.compareTo(o2);
-                            }
-                        });
-                        rooms.clear();
-                        ArrayList<AudioFileClass> audioFileTmp = (ArrayList<AudioFileClass>) msg.obj;
-                        Collections.sort(audioFileTmp, new Comparator<AudioFileClass>() {
-                            @Override
-                            public int compare(AudioFileClass o1, AudioFileClass o2) {
-                                if (o1.getNumber().equals(o2.getNumber())) {
-                                    return o1.getTitle().compareTo(o2.getTitle());
-                                } else {
-                                    return o1.getNumber().compareTo(o2.getNumber());
-                                }
-                            }
-                        });
-                        //audioFileTmp.sort(new Comparator<AudioFileClass>() {
-                        //     @Override
-                        //     public int compare(AudioFileClass o1, AudioFileClass o2) {
-                        //         return o1.getTitle().compareTo(o2.getTitle());
-                        //    }
-                        // });
-                        for (String y : genres_list) {
-                            ArrayList<AudioFileClass> tmp2 = new ArrayList<>();
-                            for (AudioFileClass x : audioFileTmp) {
-                                if (x.getAlbum().equals(y)) {
-                                    tmp2.add(x);
-                                }
-                            }
-                            if (tmp2.size() > 0) {
-                                rooms.add(new Room(y, tmp2));
-                            }
-                        }
-
-
-                        audioFilesMainListFragment.updateRooms(rooms);
-
-                        audioFileClassArrayList.clear();
                         try {
-                            audioFileClassArrayList.addAll((ArrayList<AudioFileClass>) msg.obj);
-                        } catch (Exception e) {
+                            dbInterface.dropMainDB();
+                            ArrayList<String> genres_list = new ArrayList<>();
+                            for (AudioFileClass x : (ArrayList<AudioFileClass>) msg.obj) {
+                                dbInterface.insertDevice(x);
+                                if (!containString(genres_list, x.getAlbum())) {
+                                    genres_list.add(x.getAlbum());
+                                }
+                            }
+
+                            //genres_list.sort(new Comparator<String>() {
+                            //    @Override
+                            //    public int compare(String o1, String o2) {
+                            //        return o1.compareTo(o2);
+                            //     }
+                            /// });
+                            Collections.sort(genres_list, new Comparator<String>() {
+                                @Override
+                                public int compare(String o1, String o2) {
+                                    return o1.compareTo(o2);
+                                }
+                            });
+                            rooms.clear();
+                            ArrayList<AudioFileClass> audioFileTmp = (ArrayList<AudioFileClass>) msg.obj;
+                            Collections.sort(audioFileTmp, new Comparator<AudioFileClass>() {
+                                @Override
+                                public int compare(AudioFileClass o1, AudioFileClass o2) {
+                                    if (o1.getNumber().equals(o2.getNumber())) {
+                                        return o1.getTitle().compareTo(o2.getTitle());
+                                    } else {
+                                        return o1.getNumber().compareTo(o2.getNumber());
+                                    }
+                                }
+                            });
+                            //audioFileTmp.sort(new Comparator<AudioFileClass>() {
+                            //     @Override
+                            //     public int compare(AudioFileClass o1, AudioFileClass o2) {
+                            //         return o1.getTitle().compareTo(o2.getTitle());
+                            //    }
+                            // });
+                            for (String y : genres_list) {
+                                ArrayList<AudioFileClass> tmp2 = new ArrayList<>();
+                                for (AudioFileClass x : audioFileTmp) {
+                                    if (x.getAlbum().equals(y)) {
+                                        tmp2.add(x);
+                                    }
+                                }
+                                if (tmp2.size() > 0) {
+                                    rooms.add(new Room(y, tmp2));
+                                }
+                            }
+
+
+                            audioFilesMainListFragment.updateRooms(rooms);
+
+                            audioFileClassArrayList.clear();
+                            try {
+                                audioFileClassArrayList.addAll((ArrayList<AudioFileClass>) msg.obj);
+                            } catch (Exception e) {
+
+                            }
+                            Log.d("AudioFiles", String.valueOf(audioFileClassArrayList.size()));
+                        }
+                        catch (Exception e)
+                        {
 
                         }
-                        Log.d("AudioFiles", String.valueOf(audioFileClassArrayList.size()));
                     }
                     break;
 
@@ -955,7 +961,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
     public void Notify(String msg) {
         Snackbar.make(findViewById(R.id.drawer_layout), msg, Snackbar.LENGTH_LONG).show();
     }
-
+    /*
     public class BackgroundThread2 extends Thread {
         private Handler mBackgroundHandler;
         WifiManager wifiManager;
@@ -1069,7 +1075,7 @@ public class master_activity extends AppCompatActivity implements internalMessag
 
 
     }
-
+*/
     private  boolean checkAndRequestPermissions() {
         int locationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         int locationPermission2 = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
