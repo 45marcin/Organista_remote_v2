@@ -177,7 +177,7 @@ public class HttpRequests {
                 for (int x = 0; x < imagetmp.length(); x++) {
                     JSONObject tmp = imagetmp.getJSONObject(x);
                     //audioFileArrayList.add(new ImageFile(tmp.getString("title"), tmp.getString("path"),tmp.getString("album")));
-                    data2.add(new ImageFile(tmp.getString("title"), tmp.getString("path"), tmp.getString("album")));
+                    data2.add(new ImageFile(tmp.getString("title"), tmp.getString("path"), tmp.getString("path")));
                 }
                 HashResponse.put("imageData", true);
             }
@@ -252,7 +252,7 @@ public class HttpRequests {
 
     public static int ShowImage(String url, String path) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/showImage";
+            String urll = "http:/"+  url + ":9000/start?image=show&file="+path;
             Log.d("url", urll);
             Log.d("path", path);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
@@ -373,13 +373,14 @@ public class HttpRequests {
 
     public static int StopTimeAudioCancel(String url) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/start?audio=stop_time_cancek";
+            String urll = "http:/"+  url + ":9000/start?audio=stop_time_cancel";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
             JSONObject object = new JSONObject();
             RequestBody body = RequestBody.create(MediaType.parse("application/json"), object.toString());
             Request request = new Request.Builder()
                     .url(urll)
+                    .post(body)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("cache-control", "no-cache")
                     .build();
@@ -419,7 +420,7 @@ public class HttpRequests {
     }
     public static int PauseResumVideo(String url) throws IOException {
         try {
-            String urll = "http:/"+  url + ":9000/pauseVideo";
+            String urll = "http:/"+  url + ":9000/start?video=play_pause";
             Log.d("url", urll);
             OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
             JSONObject object = new JSONObject();
@@ -428,6 +429,7 @@ public class HttpRequests {
                     .url(urll)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("cache-control", "no-cache")
+                    .post(body)
                     .build();
             Response response = client.newCall(request).execute();
             Log.d("response status", response.body().string());
